@@ -1,3 +1,5 @@
+View in CODE
+
 🧪 AI-Powered Lead Optimization App
 
 This is a Flask-based web application designed for drug discovery and lead compound optimization, using data from UniProt and ChEMBL. The app retrieves biological target information, fetches lead compounds, calculates physicochemical properties, checks drug-likeness (Lipinski’s Rule), detects toxicophores, and offers suggestions for improving a lead compound.
