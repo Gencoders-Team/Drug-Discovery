@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Drug Discovery Platform Documentation</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 1200px; margin: auto; }
+        h1 { color: #2c3e50; }
+        h2 { color: #3498db; margin-top: 30px; }
+        pre { background-color: #f5f5f5; padding: 15px; border-radius: 5px; }
+        code { background-color: #f5f5f5; padding: 2px 5px; border-radius: 3px; }
+        .nav-link { margin-right: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="main-header">
+            <h1>Drug Discovery Platform Documentation</h1>
+            <nav class="header-nav">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+            </nav>
+        </header>
+
+        <h2>Table of Contents</h2>
+        <ol>
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#dependencies">Dependencies</a></li>
+            <li><a href="#api">API Endpoints</a></li>
+            <li><a href="#functions">Key Functions</a></li>
+            <li><a href="#data">Data Processing</a></li>
+            <li><a href="#visualization">3D Visualization</a></li>
+            <li><a href="#error">Error Handling</a></li>
+            <li><a href="#setup">Setup Instructions</a></li>
+            <li><a href="#usage">Example Usage</a></li>
+        </ol>
+
+        <h2 id="overview">1. Overview</h2>
+        <p>Flask-based web platform for drug discovery research with features:</p>
+        <ul>
+            <li>Protein target information retrieval from UniProt</li>
+            <li>Compound data fetching from ChEMBL</li>
+            <li>Chemical property calculations using RDKit</li>
+            <li>3D molecular visualization with NGL</li>
+            <li>Lead optimization suggestions</li>
+            <li>Similarity searching</li>
+            <li>Toxicity prediction</li>
+        </ul>
+
+        <h2 id="dependencies">2. Dependencies</h2>
+        <h3>Core Packages:</h3>
+        <ul>
+            <li>Flask (v2.3.2)</li>
+            <li>RDKit (v2023.9.5)</li>
+            <li>Requests (v2.31.0)</li>
+            <li>Pandas (v2.1.4)</li>
+            <li>NumPy (v1.26.2)</li>
+        </ul>
+
+        <h3>Additional Libraries:</h3>
+        <ul>
+            <li>DeepChem (v2.7.1) - Molecular machine learning</li>
+            <li>PubChemPy (v1.0.4) - PubChem integration</li>
+            <li>scikit-learn (v1.3.2) - Similarity calculations</li>
+            <li>Chembl_webresource_client (v0.10.8) - ChEMBL API</li>
+            <li>python-dotenv (v1.0.0) - Environment management</li>
+        </ul>
+
+        <h2 id="api">3. API Endpoints</h2>
+        <h3>3.1 GET /api/target</h3>
+        <p><strong>Parameters:</strong> proteinId (UniProt ID or gene name)</p>
+        <p><strong>Returns:</strong> JSON with protein metadata and functions</p>
+        <pre>{
+  "accession": "P00533",
+  "protein_name": "Epidermal growth factor receptor",
+  "gene_names": "EGFR",
+  "organism": "Homo sapiens",
+  "functions": [...]
+}</pre>
+
+        <h3>3.2 GET /api/chembl_leads</h3>
+        <p><strong>Parameters:</strong> proteinId</p>
+        <p><strong>Returns:</strong> JSON array of ChEMBL compounds</p>
+        <p><strong>Fields:</strong> chembl_id, smiles, IC50, molecular properties</p>
+
+        <h3>3.3 POST /api/optimize</h3>
+        <p><strong>Parameters:</strong> JSON payload with leadSmiles and compounds</p>
+        <p><strong>Returns:</strong> Optimization suggestions and similar compounds</p>
+        <pre>{
+  "leadSmiles": "CN1C=NC2=C1C(=O)N(C(=O)N2C)C",
+  "leadIc50": 50,
+  "allCompounds": [...]
+}</pre>
+
+        <h2 id="functions">4. Key Functions</h2>
+        <h3>4.1 Chemical Processing</h3>
+        <ul>
+            <li>get_chembl_compounds(): Fetches bioactive compounds from ChEMBL</li>
+            <li>optimize_lead(): Generates lead optimization suggestions</li>
+            <li>calculate_properties(): Computes molecular descriptors</li>
+        </ul>
+
+        <h3>4.2 Visualization</h3>
+        <ul>
+            <li>view3DStructure(): Renders 3D molecular structures</li>
+            <li>setNGLStyle(): Controls molecular representation</li>
+            <li>measureNGLDistance(): Interactive distance measurements</li>
+        </ul>
+
+        <h3>4.3 Utility Functions</h3>
+        <ul>
+            <li>copyToClipboard(): SMILES string handling</li>
+            <li>showLoading(): UI status indicators</li>
+            <li>createTooltip(): Measurement guidance</li>
+        </ul>
+
+        <h2 id="data">5. Data Processing</h2>
+        <h3>5.1 Input Validation</h3>
+        <ul>
+            <li>SMILES sanitization with RDKit</li>
+            <li>UniProt ID format checking</li>
+            <li>IC50 value normalization</li>
+        </ul>
+
+        <h3>5.2 Chemical Calculations</h3>
+        <ul>
+            <li>Molecular weight</li>
+            <li>LogP (lipophilicity)</li>
+            <li>Topological polar surface area (TPSA)</li>
+            <li>H-bond donors/acceptors</li>
+            <li>Lipinski's Rule of Five analysis</li>
+        </ul>
+
+        <h3>5.3 Similarity Search</h3>
+        <ul>
+            <li>Tanimoto similarity using RDKit fingerprints</li>
+            <li>Nearest neighbor search with scikit-learn</li>
+        </ul>
+
+        <h2 id="visualization">6. 3D Visualization Features</h3>
+        <ul>
+            <li><strong>Multiple representation styles:</strong>
+                <ul>
+                    <li>Ball+Stick</li>
+                    <li>Spacefill</li>
+                    <li>Licorice</li>
+                    <li>Surface representations</li>
+                </ul>
+            </li>
+            <li><strong>Interactive controls:</strong>
+                <ul>
+                    <li>Zoom In/Out</li>
+                    <li>Rotation control</li>
+                    <li>Background toggling</li>
+                    <li>Measurement tools</li>
+                </ul>
+            </li>
+            <li><strong>Supported file formats:</strong>
+                <ul>
+                    <li>SDF</li>
+                    <li>PDB</li>
+                    <li>SMILES-based generation</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2 id="error">7. Error Handling</h2>
+        <h3>HTTP status codes:</h3>
+        <ul>
+            <li>400 - Invalid input</li>
+            <li>404 - Data not found</li>
+            <li>500 - Server error</li>
+        </ul>
+
+        <h3>Validation checks:</h3>
+        <ul>
+            <li>SMILES validity</li>
+            <li>Protein ID existence</li>
+            <li>File format verification</li>
+        </ul>
+
+        <h3>Rate limiting:</h3>
+        <ul>
+            <li>ChEMBL API: 1 request/second</li>
+            <li>UniProt API: 20 requests/minute</li>
+        </ul>
+
+        <h2 id="setup">8. Setup Instructions</h2>
+        <ol>
+            <li>Install requirements:
+                <pre>pip install -r requirements.txt</pre>
+            </li>
+            <li>Configure environment:
+                <p>Create .env file with:</p>
+                <pre>FLASK_ENV=development
+UPLOAD_FOLDER=./uploads</pre>
+            </li>
+            <li>Initialize directories:
+                <pre>mkdir uploads</pre>
+            </li>
+            <li>Start application:
+                <pre>flask run --host=0.0.0.0 --port=5006</pre>
+            </li>
+            <li>Access interface at:
+                <pre>http://localhost:5006</pre>
+            </li>
+        </ol>
+
+        <h2 id="usage">9. Example Usage</h2>
+        <h3>9.1 Target Search</h3>
+        <ol>
+            <li>Enter "EGFR" in protein ID field</li>
+            <li>Click "Search Target"</li>
+            <li>View protein metadata and functions</li>
+        </ol>
+
+        <h3>9.2 Compound Analysis</h3>
+        <ol>
+            <li>Click "Load Compounds"</li>
+            <li>Select compound row</li>
+            <li>Click "View 3D" for structure</li>
+            <li>Use style controls to modify display</li>
+        </ol>
+
+        <h3>9.3 Lead Optimization</h3>
+        <ol>
+            <li>Enter lead compound SMILES</li>
+            <li>Click "Optimize"</li>
+            <li>Review property analysis</li>
+            <li>Explore similar compounds</li>
+        </ol>
+    </div>
+</body>
+</html>
